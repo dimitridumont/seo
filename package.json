@@ -1,0 +1,16 @@
+{
+	"name": "@hexa-web/seo",
+	"version": "1.0.0",
+	"description": "Shared JSON-LD builders and GA4 analytics helpers for Hexa Web projects",
+	"license": "MIT",
+	"type": "module",
+	"exports": {
+		"./json-ld": "./src/json-ld/index.ts",
+		"./analytics": "./src/analytics/index.ts"
+	},
+	"files": ["src"],
+	"peerDependencies": {
+		"react": "^19",
+		"next": "^16"
+	}
+}
