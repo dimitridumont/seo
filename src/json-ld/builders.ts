@@ -64,6 +64,7 @@ type LocalBusinessOptions = {
 	priceRange?: string
 	paymentAccepted?: string[]
 	currenciesAccepted?: string
+	servicesCatalogName?: string
 	siret?: string
 	logo?: string
 	images?: string[]
@@ -181,6 +182,9 @@ export const buildLocalBusinessSchema = (options: LocalBusinessOptions) => {
 					...(s.url ? { url: s.url } : {}),
 				},
 			})),
+			...(options.servicesCatalogName
+				? { name: options.servicesCatalogName }
+				: {}),
 		}
 	}
 
