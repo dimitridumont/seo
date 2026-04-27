@@ -22,6 +22,7 @@ type AggregateRating = {
 	count: number
 	bestRating?: number
 	worstRating?: number
+	countType?: "review" | "rating"
 }
 
 type Review = {
@@ -44,7 +45,9 @@ type AreaServed = {
 
 type LocalBusinessOptions = {
 	type?: string | string[]
+	id?: string
 	name: string
+	alternateName?: string
 	legalName?: string
 	description: string
 	url: string
@@ -53,11 +56,14 @@ type LocalBusinessOptions = {
 	address: Address
 	geo: GeoCoordinates
 	areaServed?: AreaServed[]
+	serviceArea?: AreaServed[]
 	openingHours: OpeningHours | OpeningHours[]
 	aggregateRating?: AggregateRating
 	reviews?: Review[]
 	services?: Service[]
 	priceRange?: string
+	paymentAccepted?: string[]
+	currenciesAccepted?: string
 	siret?: string
 	logo?: string
 	images?: string[]
@@ -68,7 +74,7 @@ type LocalBusinessOptions = {
 export const buildLocalBusinessSchema = (options: LocalBusinessOptions) => {
 	const base: Record<string, unknown> = {
 		"@context": "https://schema.org",
-		"@id": `${options.url}/#localbusiness`,
+		"@id": options.id ?? `${options.url}/#localbusiness`,
 		"@type": options.type ?? "LocalBusiness",
 		address: {
 			"@type": "PostalAddress",
@@ -91,7 +97,10 @@ export const buildLocalBusinessSchema = (options: LocalBusinessOptions) => {
 	}
 
 	if (options.legalName) base.legalName = options.legalName
+	if (options.alternateName) base.alternateName = options.alternateName
 	if (options.priceRange) base.priceRange = options.priceRange
+	if (options.paymentAccepted) base.paymentAccepted = options.paymentAccepted
+	if (options.currenciesAccepted) base.currenciesAccepted = options.currenciesAccepted
 	if (options.logo) base.logo = options.logo
 	if (options.images) base.image = options.images
 	if (options.sameAs) base.sameAs = options.sameAs
@@ -113,6 +122,14 @@ export const buildLocalBusinessSchema = (options: LocalBusinessOptions) => {
 		}))
 	}
 
+	if (options.serviceArea) {
+		base.serviceArea = options.serviceArea.map((a) => ({
+			"@type": a.type,
+			name: a.name,
+			...(a.sameAs ? { sameAs: a.sameAs } : {}),
+		}))
+	}
+
 	const hoursArray = Array.isArray(options.openingHours)
 		? options.openingHours
 		: [options.openingHours]
@@ -125,11 +142,15 @@ export const buildLocalBusinessSchema = (options: LocalBusinessOptions) => {
 	}))
 
 	if (options.aggregateRating) {
+		const countKey =
+			options.aggregateRating.countType === "rating"
+				? "ratingCount"
+				: "reviewCount"
 		base.aggregateRating = {
 			"@type": "AggregateRating",
 			bestRating: options.aggregateRating.bestRating ?? 5,
+			[countKey]: options.aggregateRating.count,
 			ratingValue: options.aggregateRating.value,
-			reviewCount: options.aggregateRating.count,
 			worstRating: options.aggregateRating.worstRating ?? 1,
 		}
 	}
@@ -171,6 +192,7 @@ export const buildWebsiteSchema = (options: {
 	description: string
 	url: string
 	language?: string
+	publisherId?: string
 }) => ({
 	"@context": "https://schema.org",
 	"@id": `${options.url}/#website`,
@@ -178,7 +200,7 @@ export const buildWebsiteSchema = (options: {
 	description: options.description,
 	inLanguage: options.language ?? "fr-FR",
 	name: options.name,
-	publisher: { "@id": `${options.url}/#organization` },
+	publisher: { "@id": options.publisherId ?? `${options.url}/#organization` },
 	url: options.url,
 })
 
@@ -254,32 +276,44 @@ export const buildBreadcrumbSchema = (
 
 export const buildServiceSchema = (options: {
 	baseUrl: string
-	id: string
+	id?: string
+	url?: string
 	name: string
 	description: string
-	serviceType: string
+	serviceType: string | string[]
 	offers: unknown
-	providerName: string
+	providerId?: string
+	providerName?: string
 	areaServed?: AreaServed[]
-}) => ({
-	"@context": "https://schema.org",
-	"@id": `${options.baseUrl}${options.id}`,
-	"@type": "Service",
-	description: options.description,
-	name: options.name,
-	offers: options.offers,
-	provider: {
-		"@id": `${options.baseUrl}/#localbusiness`,
-		"@type": "ProfessionalService",
-		name: options.providerName,
-	},
-	serviceType: options.serviceType,
-	...(options.areaServed
-		? {
-				areaServed: options.areaServed.map((a) => ({
-					"@type": a.type,
-					name: a.name,
-				})),
-			}
-		: {}),
-})
+}) => {
+	const provider: Record<string, unknown> = {
+		"@id": options.providerId ?? `${options.baseUrl}/#localbusiness`,
+	}
+	if (options.providerName) {
+		provider["@type"] = "ProfessionalService"
+		provider.name = options.providerName
+	}
+
+	const schema: Record<string, unknown> = {
+		"@context": "https://schema.org",
+		"@type": "Service",
+		description: options.description,
+		name: options.name,
+		offers: options.offers,
+		provider,
+		serviceType: options.serviceType,
+	}
+
+	if (options.id) schema["@id"] = `${options.baseUrl}${options.id}`
+	if (options.url) schema.url = options.url
+
+	if (options.areaServed) {
+		schema.areaServed = options.areaServed.map((a) => ({
+			"@type": a.type,
+			name: a.name,
+			...(a.sameAs ? { sameAs: a.sameAs } : {}),
+		}))
+	}
+
+	return schema
+}
