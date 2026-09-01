@@ -1,6 +1,6 @@
 {
 	"name": "@hexa-web/seo",
-	"version": "1.3.0",
+	"version": "1.4.0",
 	"description": "Shared JSON-LD builders and GA4 analytics helpers for Hexa Web projects",
 	"license": "MIT",
 	"type": "module",

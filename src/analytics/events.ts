@@ -1,5 +1,6 @@
 export const GA_EVENTS = {
 	CLICK_ADDRESS: "click_address",
+	CLICK_AVIS: "click_avis",
 	CLICK_CONTACT: "click_contact",
 	CLICK_DEVIS: "click_devis",
 	CLICK_EMAIL: "click_email",

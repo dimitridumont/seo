@@ -51,6 +51,7 @@ sendGAEvent(GA_EVENTS.CLICK_CONTACT)
 sendGAEvent(GA_EVENTS.CLICK_DEVIS)
 sendGAEvent(GA_EVENTS.CLICK_ADDRESS)
 sendGAEvent(GA_EVENTS.CLICK_WHATSAPP)
+sendGAEvent(GA_EVENTS.CLICK_AVIS)
 
 // Custom project-specific events
 sendGAEvent("click_on_audit_submit")
