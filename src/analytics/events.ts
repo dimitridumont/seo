@@ -4,6 +4,7 @@ export const GA_EVENTS = {
 	CLICK_DEVIS: "click_devis",
 	CLICK_EMAIL: "click_email",
 	CLICK_PHONE: "click_phone",
+	CLICK_WHATSAPP: "click_whatsapp",
 } as const
 
 export type GAEvent = (typeof GA_EVENTS)[keyof typeof GA_EVENTS]
