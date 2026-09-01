@@ -44,15 +44,28 @@ Available builders:
 ```ts
 import { GA_EVENTS, sendGAEvent } from "@hexa-web/seo/analytics"
 
-// Standard events (available in all projects)
 sendGAEvent(GA_EVENTS.CLICK_PHONE)
-sendGAEvent(GA_EVENTS.CLICK_EMAIL)
-sendGAEvent(GA_EVENTS.CLICK_CONTACT)
-sendGAEvent(GA_EVENTS.CLICK_DEVIS)
-sendGAEvent(GA_EVENTS.CLICK_ADDRESS)
-sendGAEvent(GA_EVENTS.CLICK_WHATSAPP)
-sendGAEvent(GA_EVENTS.CLICK_AVIS)
+```
 
-// Custom project-specific events
+Same event for the same thing on every site: the monthly report counts them
+by name.
+
+| Event            | Fire on         | Counted as a contact |
+| ---------------- | --------------- | -------------------- |
+| `CLICK_PHONE`    | phone link      | yes                  |
+| `CLICK_EMAIL`    | email link      | yes                  |
+| `CLICK_WHATSAPP` | WhatsApp link   | yes                  |
+| `CLICK_CONTACT`  | CTA to the form | yes                  |
+| `CLICK_DEVIS`    | form **sent**   | yes                  |
+| `CLICK_ADDRESS`  | maps link       | no                   |
+| `CLICK_AVIS`     | Google profile  | no                   |
+
+A click leading to the form is `CLICK_CONTACT`, never `CLICK_DEVIS`, or one
+visitor counts twice. A link leaving the site for something that is not a way
+to reach the client is not a contact.
+
+Anything else stays project-specific, and stays out of the report:
+
+```ts
 sendGAEvent("click_on_audit_submit")
 ```
