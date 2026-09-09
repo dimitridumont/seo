@@ -1,12 +1,19 @@
-export const sendGAEvent = (event: string) => {
+export const sendGAEvent = (
+	event: string,
+	params?: Record<string, unknown>,
+) => {
 	if (typeof window !== "undefined" && typeof window.gtag === "function") {
-		window.gtag("event", event)
+		window.gtag("event", event, params)
 	}
 }
 
 declare global {
 	interface Window {
-		gtag?: (command: string, action: string) => void
+		gtag?: (
+			command: string,
+			action: string,
+			params?: Record<string, unknown>,
+		) => void
 		dataLayer?: unknown[]
 	}
 }

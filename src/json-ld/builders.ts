@@ -37,6 +37,11 @@ type Service = {
 	url?: string
 }
 
+type Founder = {
+	name: string
+	sameAs?: string[]
+}
+
 type AreaServed = {
 	type: "Country" | "AdministrativeArea" | "City"
 	name: string
@@ -215,6 +220,7 @@ export const buildOrganizationSchema = (options: {
 	email: string
 	telephone: string
 	address: Address
+	founders?: Founder[]
 	logo?: { url: string; width: number; height: number }
 	ogImage?: string
 	sameAs?: string[]
@@ -232,6 +238,15 @@ export const buildOrganizationSchema = (options: {
 	},
 	description: options.description,
 	email: options.email,
+	...(options.founders
+		? {
+				founder: options.founders.map((f) => ({
+					"@type": "Person",
+					name: f.name,
+					...(f.sameAs ? { sameAs: f.sameAs } : {}),
+				})),
+			}
+		: {}),
 	...(options.ogImage ? { image: options.ogImage } : {}),
 	...(options.logo
 		? {
@@ -289,6 +304,8 @@ export const buildServiceSchema = (options: {
 	providerId?: string
 	providerName?: string
 	areaServed?: AreaServed[]
+	hasOfferCatalog?: unknown
+	workExample?: unknown
 }) => {
 	const provider: Record<string, unknown> = {
 		"@id": options.providerId ?? `${options.baseUrl}/#localbusiness`,
@@ -318,6 +335,9 @@ export const buildServiceSchema = (options: {
 			...(a.sameAs ? { sameAs: a.sameAs } : {}),
 		}))
 	}
+
+	if (options.hasOfferCatalog) schema.hasOfferCatalog = options.hasOfferCatalog
+	if (options.workExample) schema.workExample = options.workExample
 
 	return schema
 }

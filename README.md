@@ -32,12 +32,17 @@ const schemas = [
 
 Available builders:
 - `buildLocalBusinessSchema` — LocalBusiness with address, services, reviews, ratings
-- `buildOrganizationSchema` — Organization with logo, social links
+- `buildOrganizationSchema` — Organization with logo, social links, `founders`
 - `buildWebsiteSchema` — WebSite
 - `buildFaqSchema` — FAQPage
 - `buildBreadcrumbSchema` — BreadcrumbList
-- `buildServiceSchema` — Service with provider and area served
+- `buildServiceSchema` — Service with provider, area served, `hasOfferCatalog`, `workExample`
 - `sanitizeJsonLd` — XSS protection for raw JSON-LD strings
+
+Every option above is optional: pass none of them and the emitted JSON-LD is
+exactly what it was before they existed. `founders` is for sites with author
+pages to link back to; `hasOfferCatalog` and `workExample` for sites listing
+several offers or past work under one service.
 
 ### Analytics
 
@@ -45,7 +50,11 @@ Available builders:
 import { GA_EVENTS, sendGAEvent } from "@hexa-web/seo/analytics"
 
 sendGAEvent(GA_EVENTS.CLICK_PHONE)
+sendGAEvent(GA_EVENTS.CLICK_PHONE, { section: "hero" })
 ```
+
+The second argument is optional and goes straight to GA4 as event parameters.
+Without it, nothing changes.
 
 Same event for the same thing on every site: the monthly report counts them
 by name.
