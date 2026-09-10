@@ -46,6 +46,21 @@ several offers or past work under one service.
 
 ### Analytics
 
+Load the tag once, in the root layout:
+
+```tsx
+import { GoogleAnalytics } from "@hexa-web/seo/analytics"
+
+<GoogleAnalytics gaId={GA_MEASUREMENT_ID} />
+```
+
+It renders nothing outside `NODE_ENV === "production"`, so a `npm run dev`
+session never reaches the property. It declares the `gtag` stub as soon as the
+page is interactive and defers the 191 KB of `gtag.js` to `lazyOnload`: clicks
+that happen before the file lands are queued in `dataLayer` and replayed, they
+are not lost. Write it by hand and it is easy to put the stub on `lazyOnload`
+too, which silently drops every click until the window `load` event.
+
 ```ts
 import { GA_EVENTS, sendGAEvent } from "@hexa-web/seo/analytics"
 
@@ -54,7 +69,8 @@ sendGAEvent(GA_EVENTS.CLICK_PHONE, { section: "hero" })
 ```
 
 The second argument is optional and goes straight to GA4 as event parameters.
-Without it, nothing changes.
+Without it, nothing changes. If `gtag` does not exist yet, `sendGAEvent`
+recreates Google's own stub and pushes to `dataLayer`, so the event survives.
 
 Same event for the same thing on every site: the monthly report counts them
 by name.
