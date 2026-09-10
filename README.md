@@ -31,7 +31,7 @@ const schemas = [
 ```
 
 Available builders:
-- `buildLocalBusinessSchema` — LocalBusiness with address, services, reviews, ratings
+- `buildLocalBusinessSchema` — LocalBusiness with address, services, reviews, ratings, `amenityFeatures`, `hasOfferCatalog`
 - `buildOrganizationSchema` — Organization with logo, social links, `founders`
 - `buildWebsiteSchema` — WebSite
 - `buildFaqSchema` — FAQPage
@@ -43,6 +43,12 @@ Every option above is optional: pass none of them and the emitted JSON-LD is
 exactly what it was before they existed. `founders` is for sites with author
 pages to link back to; `hasOfferCatalog` and `workExample` for sites listing
 several offers or past work under one service.
+
+On `buildLocalBusinessSchema`, `hasOfferCatalog` takes a catalog written by
+hand, priced products for instance, and replaces the one `services` would
+build. `amenityFeatures` lists what the place offers (24/7 access, parking).
+`images` and `paymentAccepted` take a single string as well as an array, and
+emit it as given.
 
 ### Analytics
 

@@ -48,6 +48,11 @@ type AreaServed = {
 	sameAs?: string
 }
 
+type AmenityFeature = {
+	name: string
+	value: boolean
+}
+
 type LocalBusinessOptions = {
 	type?: string | string[]
 	id?: string
@@ -67,12 +72,14 @@ type LocalBusinessOptions = {
 	reviews?: Review[]
 	services?: Service[]
 	priceRange?: string
-	paymentAccepted?: string[]
+	paymentAccepted?: string | string[]
 	currenciesAccepted?: string
 	servicesCatalogName?: string
+	hasOfferCatalog?: unknown
+	amenityFeatures?: AmenityFeature[]
 	siret?: string
 	logo?: string
-	images?: string[]
+	images?: string | string[]
 	sameAs?: string[]
 	googleMapsUrl?: string
 }
@@ -175,7 +182,17 @@ export const buildLocalBusinessSchema = (options: LocalBusinessOptions) => {
 		}))
 	}
 
-	if (options.services) {
+	if (options.amenityFeatures) {
+		base.amenityFeature = options.amenityFeatures.map((f) => ({
+			"@type": "LocationFeatureSpecification",
+			name: f.name,
+			value: f.value,
+		}))
+	}
+
+	if (options.hasOfferCatalog) {
+		base.hasOfferCatalog = options.hasOfferCatalog
+	} else if (options.services) {
 		base.hasOfferCatalog = {
 			"@type": "OfferCatalog",
 			itemListElement: options.services.map((s) => ({
